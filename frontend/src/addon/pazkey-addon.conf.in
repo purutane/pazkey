@@ -1,0 +1,11 @@
+[Addon]
+Name=pazkey
+Category=InputMethod
+Version=@PROJECT_VERSION@
+Library=pazkey
+Type=SharedLibrary
+OnDemand=True
+Configurable=True
+
+[Addon/OptionalDependencies]
+0=notifications

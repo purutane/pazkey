@@ -1,0 +1,56 @@
+name: 使っていて気づいたこと
+description: 変換の結果、キーの振る舞い、表示など、入力に使っていて気づいたことを知らせる
+body:
+  - type: markdown
+    attributes:
+      value: |
+        全部の欄を埋めなくてかまいません。分かるところだけ書いてください。足りないところは、こちらから聞きます。
+
+        issue は公開されます。入力した文章（読み、候補、確定した文字列）を書くときは、公開してよいものだけにしてください。変換の結果についての報告では、打った読みと出た候補が要ります。
+  - type: input
+    id: where
+    attributes:
+      label: どこで
+      description: アプリと入力欄。分かれば、Wayland か X11 か。
+      placeholder: KWrite（Wayland）、Firefox の検索欄
+  - type: textarea
+    id: did
+    attributes:
+      label: 何をした
+      description: 打ったキーを順に書いてください。
+      placeholder: kikai と打って Space、↓ を2回、Enter
+  - type: textarea
+    id: happened
+    attributes:
+      label: 何が起きた
+      placeholder: 「機会」が確定された。候補ウィンドウが一瞬消えた
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 何を期待した
+      description: どうなると思ったか。ほかの入力メソッド（Mozc など）と比べた結果でもかまいません。
+      placeholder: 「機械」が確定されると思った。Mozc ならそうなる
+  - type: dropdown
+    id: reproduce
+    attributes:
+      label: 再現するか
+      options:
+        - 毎回
+        - たまに
+        - 一度だけ
+        - 試していない
+  - type: textarea
+    id: status
+    attributes:
+      label: pazkey-ctl status の出力
+      description: 端末で `pazkey-ctl status` を実行し、出力をそのまま貼ってください。入力した文章は含まれません。
+      render: text
+  - type: textarea
+    id: environment
+    attributes:
+      label: 環境
+      description: |
+        端末で `pacman -Q fcitx5-pazkey fcitx5; echo "$XDG_CURRENT_DESKTOP $XDG_SESSION_TYPE"` を実行し、出力を貼ってください。入れた版、デスクトップ環境の名前、Wayland か X11 かが出ます。
+      render: text

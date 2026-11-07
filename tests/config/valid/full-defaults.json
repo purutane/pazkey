@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "candidates": {
+    "page_size": 9,
+    "max_pages": 5,
+    "select_with_digits": true
+  },
+  "live_conversion": {
+    "enabled": false
+  },
+  "context": {
+    "enabled": true,
+    "max_chars": 64
+  },
+  "timeout": {
+    "full_ms": 1000
+  },
+  "zenzai": {
+    "enabled": true,
+    "model_path": "",
+    "inference_limit": 10,
+    "device": "auto"
+  },
+  "learning": {
+    "enabled": true,
+    "save_every_commits": 20,
+    "save_idle_seconds": 60
+  },
+  "fallback": {
+    "max_crashes": 3,
+    "window_seconds": 300
+  }
+}

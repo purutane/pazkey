@@ -1,0 +1,6 @@
+// CMake が data/romaji.tsv から作る。手で編集しない。
+#pragma once
+
+namespace pazkey {
+inline constexpr const char kRomajiTsv[] = R"PAZKEY(@PAZKEY_ROMAJI_TSV@)PAZKEY";
+}

@@ -1,0 +1,32 @@
+# Swift
+.build/
+.swiftpm/
+*.xcodeproj
+
+# CMake / C++
+build/
+compile_commands.json
+
+# makepkg（PKGBUILD）の取得物と成果物
+/src/
+/pkg/
+/pazkey/
+/llama.cpp/
+*.pkg.tar*
+
+# 開発用の取得物（tools/build-llama.sh、tools/fetch-test-model.sh）
+/vendor/
+
+# 評価用の大きなデータや結果
+eval/data/
+eval/vendor/
+eval/results/
+
+# モデル
+*.gguf
+
+# Claude Code の個人設定
+.claude/settings.local.json
+
+# Python
+__pycache__/

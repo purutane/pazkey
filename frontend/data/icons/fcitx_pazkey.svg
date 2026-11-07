@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<!-- pazkey の入力メソッドのアイコン。田んぼにいる鴫（しぎ）。paz（スペイン語で「平和」）の、日本ののどかな光景。 -->
+<rect x="2" y="2" width="60" height="60" rx="14" fill="#cfe6a8"/><rect x="2" y="44" width="60" height="18" rx="0" fill="#9cc9d6"/><rect x="2" y="48" width="60" height="14" rx="14" fill="#9cc9d6"/><path d="M10 40 L 12 50 M 14 41 L 12 50 M 52 40 L 54 50 M 56 41 L 54 50" stroke="#5e9a3a" stroke-width="1.8" stroke-linecap="round"/>
+<g transform="translate(3 1) scale(0.95)"><g stroke="#4a2f1c" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+  <path d="M30 44 L 29 54 M 26.5 54.5 L 29 54 L 31 56 M 40 44 L 41 54 M 38.5 55.5 L 41 54 L 43.5 55" fill="none" stroke="#7d6650" stroke-width="1.6"/>
+  <path d="M48 32 L 58 29.5 L 51 39 Z" fill="#8a5a30"/>
+  <ellipse cx="36.5" cy="35.5" rx="14.5" ry="10.5" fill="#c8955a"/>
+  <ellipse cx="38" cy="34" rx="8" ry="4.6" transform="rotate(-8 38 34)" fill="#9c6a3a"/>
+  <path d="M14.5 24 L 1.5 29.5 L 15 27.5 Z" fill="#3a2718"/>
+  <circle cx="21" cy="23" r="8" fill="#d9a86c"/>
+  <path d="M13.3 21.5 C 14.5 15, 25 13, 28.6 20.5 C 24 18.5, 17 18.5, 13.3 21.5 Z" fill="#5a3a22"/>
+</g>
+<circle cx="35.5" cy="33.5" r="1.1" fill="#f1dfb8"/>
+<circle cx="39.5" cy="32.3" r="1.1" fill="#f1dfb8"/>
+<circle cx="41.5" cy="35.2" r="1.1" fill="#f1dfb8"/>
+<circle cx="19" cy="23.5" r="2.1" fill="#2a1a10"/>
+<circle cx="19.6" cy="22.8" r="0.7" fill="#ffffff"/></g>
+</svg>

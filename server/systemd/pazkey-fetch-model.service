@@ -1,0 +1,7 @@
+[Unit]
+Description=pazkey: fetch the Zenzai model
+# 設定画面のボタンから起動する（docs/server.md「Zenzai のモデルの取得」）。
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/pazkey-ctl fetch-model --notify

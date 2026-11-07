@@ -1,0 +1,58 @@
+name: インストールできない・動かない
+description: ビルドやインストールに失敗した、入れたが入力メソッドに出ない、変換されない、モデルを取得できないなど
+body:
+  - type: markdown
+    attributes:
+      value: |
+        全部の欄を埋めなくてかまいません。分かるところだけ書いてください。足りないところは、こちらから聞きます。
+  - type: dropdown
+    id: stage
+    attributes:
+      label: どこで止まったか
+      options:
+        - makepkg でのビルド
+        - 入れたが、入力メソッドの一覧に pazkey が出ない
+        - pazkey に切り替えたが、変換されない
+        - 設定画面からモデルを取得できない、Zenzai が使われない
+        - その他
+    validations:
+      required: true
+  - type: textarea
+    id: did
+    attributes:
+      label: 何をした
+      description: 実行したコマンドや、操作した順に書いてください。
+      placeholder: README の手順どおりに makepkg -si を実行した
+  - type: textarea
+    id: happened
+    attributes:
+      label: 何が起きた
+      description: エラーの文言があれば、そのまま書いてください。
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: 出力
+      description: makepkg の出力など。長いときは、エラーが出たあたりから最後までを貼ってください。
+      render: text
+  - type: textarea
+    id: status
+    attributes:
+      label: pazkey-ctl status の出力
+      description: 入れたあとなら、端末で `pazkey-ctl status` を実行し、出力をそのまま貼ってください。つながらないと出たら、その文言を貼ってください。
+      render: text
+  - type: textarea
+    id: journal
+    attributes:
+      label: サーバーのログ
+      description: |
+        入れたあとなら、端末で `journalctl --user -b -u pazkey-server.socket -u pazkey-server.service -u pazkey-fetch-model.service` を実行し、出力を貼ってください。サーバーのログには入力した文章は書かれません。
+      render: text
+  - type: textarea
+    id: environment
+    attributes:
+      label: 環境
+      description: |
+        端末で `pacman -Q fcitx5-pazkey fcitx5 systemd; echo "$XDG_CURRENT_DESKTOP $XDG_SESSION_TYPE"` を実行し、出力を貼ってください。入れる前なら、`fcitx5-pazkey` がないと出てかまいません。
+      render: text

@@ -1,0 +1,7 @@
+[Unit]
+Description=pazkey conversion server socket
+
+[Socket]
+ListenStream=%t/pazkey/server.sock
+SocketMode=0600
+DirectoryMode=0700

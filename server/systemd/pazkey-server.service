@@ -1,0 +1,12 @@
+[Unit]
+Description=pazkey conversion server
+Requires=pazkey-server.socket
+StartLimitIntervalSec=0
+
+[Service]
+ExecStart=/usr/lib/pazkey/pazkey-server
+Restart=on-failure
+RestartSec=200ms
+RestartSteps=5
+RestartMaxDelaySec=10s
+TimeoutStopSec=3s

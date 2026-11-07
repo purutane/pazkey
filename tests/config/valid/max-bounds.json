@@ -1,0 +1,1 @@
+{"candidates": {"page_size": 9, "max_pages": 20}, "context": {"max_chars": 256}, "timeout": {"full_ms": 5000}, "zenzai": {"inference_limit": 1000}, "learning": {"save_every_commits": 1000, "save_idle_seconds": 3600}, "fallback": {"max_crashes": 100, "window_seconds": 86400}}

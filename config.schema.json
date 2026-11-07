@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pazkey.local/config.schema.json",
+  "title": "pazkey config",
+  "description": "docs/config.md の項目表と一致させること。既定値を変えたら両方を直す。",
+  "type": "object",
+  "properties": {
+    "version": { "const": 1, "default": 1 },
+    "candidates": {
+      "type": "object",
+      "properties": {
+        "page_size": { "type": "integer", "minimum": 1, "maximum": 9, "default": 9 },
+        "max_pages": { "type": "integer", "minimum": 1, "maximum": 20, "default": 5 },
+        "select_with_digits": { "type": "boolean", "default": true }
+      }
+    },
+    "live_conversion": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean", "default": false }
+      }
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "max_chars": { "type": "integer", "minimum": 0, "maximum": 256, "default": 64 }
+      }
+    },
+    "timeout": {
+      "type": "object",
+      "properties": {
+        "full_ms": { "type": "integer", "minimum": 50, "maximum": 5000, "default": 1000 }
+      }
+    },
+    "zenzai": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "model_path": { "type": "string", "default": "" },
+        "inference_limit": { "type": "integer", "minimum": 1, "maximum": 1000, "default": 10 },
+        "device": { "type": "string", "minLength": 1, "default": "auto" }
+      }
+    },
+    "learning": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "save_every_commits": { "type": "integer", "minimum": 1, "maximum": 1000, "default": 20 },
+        "save_idle_seconds": { "type": "integer", "minimum": 5, "maximum": 3600, "default": 60 }
+      }
+    },
+    "fallback": {
+      "type": "object",
+      "properties": {
+        "max_crashes": { "type": "integer", "minimum": 1, "maximum": 100, "default": 3 },
+        "window_seconds": { "type": "integer", "minimum": 10, "maximum": 86400, "default": 300 }
+      }
+    }
+  }
+}
