@@ -4,7 +4,7 @@
 # PKGBUILD と同じにする。
 
 pkgname=fcitx5-pazkey-bin
-pkgver=0.2.0
+pkgver=0.2.1
 pkgrel=1
 # Release に置いた tar のビルド番号。ソースを変えずに作り直したとき（fcitx5 の ABI が変わったときなど）に上げる。
 _build=1
@@ -18,6 +18,8 @@ depends=('fcitx5' 'systemd>=254' 'curl' 'glibc' 'libgcc' 'libstdc++' 'libgomp' '
 provides=("fcitx5-pazkey=$pkgver")
 conflicts=('fcitx5-pazkey')
 # 中身はリリースのビルドで、strip も済んでいる。
+# 入れたときに、起動し直す手順を表示する（リポジトリ直下の pazkey.install へのリンク）。
+install=pazkey.install
 options=('!strip' '!debug')
 source_x86_64=("https://github.com/purutane/pazkey/releases/download/v$pkgver/pazkey-$pkgver-$_build-$CARCH.tar.zst")
 sha256sums_x86_64=('2a3a3ed45c0a856a14f2704191054af4396703d74ff241a2448964d616bc2aed')

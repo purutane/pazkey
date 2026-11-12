@@ -56,6 +56,7 @@ mkdir -p "$out/build" "$out/tree"
 # PKGBUILD を写し、版、llama.cpp の設定、（試すときは）取得元を替える。置き換えは、それぞれ1か所だけのはず。
 pkgbuild=$out/build/PKGBUILD
 git -C "$here" show HEAD:PKGBUILD > "$pkgbuild"
+git -C "$here" show HEAD:pazkey.install > "$out/build/pazkey.install"
 replace() {
     local from=$1 to=$2
     if [[ $(grep -cF -- "$from" "$pkgbuild") != 1 ]]; then

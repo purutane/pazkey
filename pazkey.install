@@ -1,0 +1,19 @@
+# パッケージを入れたときと版を上げたときに、起動し直す手順を表示する（docs/server.md「systemd ユニット」）。
+# ユーザーの systemd はログインし直しても止まらないことがあり、動いている変換サーバーは前の版のまま残る。
+
+post_install() {
+    cat << 'NOTE'
+==> pazkey: 入れたあとは、ログインし直してください。
+    もう一方の版（fcitx5-pazkey と fcitx5-pazkey-bin）から入れ替えたときは、
+    先に次のコマンドで変換サーバーを起動し直してください。
+    systemctl --user restart pazkey-server.service
+NOTE
+}
+
+post_upgrade() {
+    cat << 'NOTE'
+==> pazkey: 新しい版を使うには、次のコマンドで変換サーバーを起動し直し、ログインし直してください。
+    systemctl --user restart pazkey-server.service
+    ログインし直すだけでは、変換サーバーが前の版のまま残ることがあります。
+NOTE
+}

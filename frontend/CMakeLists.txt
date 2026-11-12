@@ -4,7 +4,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
     message(FATAL_ERROR "ビルドは別のディレクトリで行う（例: cmake -B build）")
 endif()
 
-project(fcitx5-pazkey VERSION 0.1.0 LANGUAGES CXX)
+project(fcitx5-pazkey VERSION 0.2.1 LANGUAGES CXX)
 include(GNUInstallDirs)
 
 set(CMAKE_CXX_STANDARD 20)

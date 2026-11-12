@@ -14,6 +14,7 @@ run() {
 run frontend/build/pazkey-tests --gtest_brief=1    # 入力状態、ローマ字、JSON、設定
 run frontend/build/pazkey-client-tests --gtest_brief=1  # サーバーへの接続
 run frontend/build/pazkey-fcitx-config-tests --gtest_brief=1  # 設定画面とのやりとり
+run python -I tests/check_versions.py             # 版の文字列がそろっている
 run python -I tests/config/check.py                # 設定の判定がスキーマ、サーバー、フロントエンドで一致する
 run python tests/server/test_learning.py           # 学習がその場で反映される
 run python tests/server/test_restart.py            # 落ちても続けられる（systemd --user を使う）

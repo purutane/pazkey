@@ -51,7 +51,11 @@ AUR に2つの版があります。ふつうはビルド済みの `fcitx5-pazkey
 
 ソースからビルドする `fcitx5-pazkey` を入れるときは、先に `swift-bin` を入れてから、同じ手順で `fcitx5-pazkey` を入れてください。`swift-bin` はビルドにだけ使います。pazkey は使う Swift のランタイムを同梱しているので、入れたあとは `sudo pacman -Rns swift-bin` で外してかまいません（版を上げるときにまた要ります）。2つの版は同時には入れられません。
 
-版を上げたあとは、ログインし直してください。
+版を上げたあとは、次のコマンドで変換サーバーを起動し直し、ログインし直してください。ログインし直すだけでは、変換サーバーが前の版のまま残ることがあります。
+
+```sh
+systemctl --user restart pazkey-server.service
+```
 
 ## Zenzai のモデル
 

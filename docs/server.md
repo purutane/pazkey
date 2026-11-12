@@ -257,6 +257,8 @@ ExecStart=/usr/bin/pazkey-ctl fetch-model --notify
 
 ソケットのユニットは、既定で有効にする。パッケージが `/usr/lib/systemd/user/sockets.target.wants/pazkey-server.socket`（`../pazkey-server.socket` へのリンク）を持つ。プリセットや `systemctl --global enable` を使わないのは、Arch ではユーザーのユニットのプリセットが入れても適用されず、`--global enable` が作る `/etc` のリンクは pacman が管理しない（外したときに残る）からである。ソケットのユニットには `[Install]` を書かない。書くと、`/etc` と `~/.config` にリンクがないので、`systemctl --user is-enabled` や `status` が、ログインで起動するのに `disabled` と出て紛らわしい。書かなければ、同じ形で入る `dbus.socket` などと同じく `static` と出る。`enable` と `disable` は使えないので、利用者が止めるときは `systemctl --user mask pazkey-server.socket` を使う。入れた直後のセッションではソケットは待ち受けていないので、ログインし直す（または `systemctl --user start pazkey-server.socket`）。`RestartSteps` を使うので、systemd 254 以上が要る。
 
+版を上げても、動いている変換サーバーは入れ替わらない。ユーザーの systemd はログインし直しても止まらないことがあり、ソケットで起動したサーバーは前の版の実行ファイルのまま動き続ける。パッケージは、入れたときと版を上げたときに、`systemctl --user restart pazkey-server.service` で起動し直し、fcitx5 も起動し直すよう表示する（`pazkey.install`）。
+
 `StartLimitIntervalSec`、`RestartSec`、`RestartSteps`、`RestartMaxDelaySec` は「再起動回数の上限」で決めた。`TimeoutStopSec` の 3s は、終わるときにかかる時間（処理中の変換を待つ分と学習の保存で、最悪で約1秒）の3倍ほどにした。
 
 ### 外部との通信を塞ぐ

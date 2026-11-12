@@ -2,7 +2,7 @@
 # 入れる場所とビルドの設定は docs/server.md「ビルド」「入れる場所」に従う。
 
 pkgname=fcitx5-pazkey
-pkgver=0.2.0
+pkgver=0.2.1
 pkgrel=1
 pkgdesc='Japanese input method for fcitx5 using azooKey'
 arch=('x86_64')
@@ -13,6 +13,8 @@ license=('MIT' 'Apache-2.0' 'Apache-2.0 WITH Swift-exception' 'BSD-2-Clause' 'BS
 depends=('fcitx5' 'systemd>=254' 'curl' 'glibc' 'libgcc' 'libstdc++' 'libgomp' 'hicolor-icon-theme')
 # ビルド済みのものを入れる fcitx5-pazkey-bin と同じファイルを入れる。
 conflicts=('fcitx5-pazkey-bin')
+# 入れたときに、起動し直す手順を表示する。
+install=pazkey.install
 makedepends=('swift-language' 'cmake' 'git' 'gtest')
 # llama.cpp は fkunn1326 版の b4846。タグは付け替えられるので、コミットで固定する（tools/build-llama.sh と同じ）。
 _llama_commit=10131b23ee0dbd9d03dfc618cec9fe3402919277
