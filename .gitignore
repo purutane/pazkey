@@ -30,3 +30,6 @@ eval/results/
 
 # Python
 __pycache__/
+
+# ビルド済みのパッケージに入れる tar（tools/build-bin.sh）
+/dist/

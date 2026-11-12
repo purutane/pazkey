@@ -2,7 +2,7 @@
 # 入れる場所とビルドの設定は docs/server.md「ビルド」「入れる場所」に従う。
 
 pkgname=fcitx5-pazkey
-pkgver=0.1.0
+pkgver=0.2.0
 pkgrel=1
 pkgdesc='Japanese input method for fcitx5 using azooKey'
 arch=('x86_64')
@@ -10,7 +10,9 @@ url='https://github.com/purutane/pazkey'
 # pazkey は MIT。残りは同梱するもの（THIRD_PARTY_NOTICES）のライセンス。
 license=('MIT' 'Apache-2.0' 'Apache-2.0 WITH Swift-exception' 'BSD-2-Clause' 'BSD-3-Clause'
          'Unicode-3.0' 'ICU' 'NAIST-2003')
-depends=('fcitx5' 'systemd>=254' 'curl' 'gcc-libs' 'glibc')
+depends=('fcitx5' 'systemd>=254' 'curl' 'glibc' 'libgcc' 'libstdc++' 'libgomp' 'hicolor-icon-theme')
+# ビルド済みのものを入れる fcitx5-pazkey-bin と同じファイルを入れる。
+conflicts=('fcitx5-pazkey-bin')
 makedepends=('swift-language' 'cmake' 'git' 'gtest')
 # llama.cpp は fkunn1326 版の b4846。タグは付け替えられるので、コミットで固定する（tools/build-llama.sh と同じ）。
 _llama_commit=10131b23ee0dbd9d03dfc618cec9fe3402919277
@@ -35,22 +37,27 @@ prepare() {
 
 build() {
     # llama.cpp: CPU 版のライブラリだけを作る（設定は tools/build-llama.sh と同じ）。
-    # GGML_NATIVE は既定（ON）のままで、ビルドする機械の CPU 向けに最適化する。
+    # ビルドする機械の CPU 向けに最適化する。GGML_NATIVE は明示する。makepkg が SOURCE_DATE_EPOCH を設定し、
+    # ggml はそれを見ると既定を OFF にし、AVX などの命令も使わなくなる（Zenzai が約4倍遅くなる）。
     cmake -S llama.cpp -B build-llama -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON \
         -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_SERVER=OFF -DLLAMA_CURL=OFF \
-        '-DCMAKE_INSTALL_RPATH=$ORIGIN' -DCMAKE_INSTALL_PREFIX="$srcdir/llama" -DCMAKE_INSTALL_LIBDIR=lib
+        -DGGML_NATIVE=ON '-DCMAKE_INSTALL_RPATH=$ORIGIN' -DCMAKE_INSTALL_PREFIX="$srcdir/llama" -DCMAKE_INSTALL_LIBDIR=lib
     cmake --build build-llama
     cmake --install build-llama
 
     # サーバーと pazkey-ctl。Swift のランタイムは /usr/lib/pazkey/swift/ に同梱するので、
     # ツールチェーンの場所と $ORIGIN を RUNPATH に入れず、同梱する場所を入れる。
+    # SwiftPM は makepkg の CXXFLAGS と LDFLAGS を読まないので、要るものはここで渡す。
+    # -fmacro-prefix-map: marisa-trie が例外のメッセージに埋める __FILE__ から $srcdir を除く。
+    # -z now: FULL RELRO にする（makepkg の LDFLAGS と同じ）。
     cd pazkey/server
     local product
     for product in pazkey-server pazkey-ctl; do
         PAZKEY_LLAMA_DIR="$srcdir/llama/lib" PAZKEY_LLAMA_RPATH=/usr/lib/pazkey/llama \
             _swift build -c release --product "$product" \
             --disable-automatic-resolution --force-resolved-versions --disable-local-rpath \
-            -Xswiftc -no-toolchain-stdlib-rpath -Xlinker -rpath -Xlinker /usr/lib/pazkey/swift
+            -Xswiftc -no-toolchain-stdlib-rpath -Xlinker -rpath -Xlinker /usr/lib/pazkey/swift \
+            -Xcxx "-fmacro-prefix-map=$srcdir/=" -Xlinker -z -Xlinker now
     done
     cd "$srcdir"
 

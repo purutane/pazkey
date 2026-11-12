@@ -129,5 +129,26 @@ with TempEnv() as env:
     c.close()
     check("正常に終わる", server.stop() == 0)
 
+# 4. llama.cpp が使う命令に CPU が対応していない → モデルを読み込まずに unsupported。
+# CPU の flags を空に差し替える（SSE3 も含めて、ビルドで使うと決めた命令がすべてないことになる）。
+with TempEnv() as env:
+    env.env["PAZKEY_TEST_CPU_FLAGS"] = ""
+    write_config(env, {"model_path": str(MODEL)})
+    server = ServerProcess(env, check_zenzai=False)
+    c = Client(env.socket)
+    check("CPU が対応していなければ unsupported", c.hello["zenzai"] == "unsupported", c.hello)
+    check("CPU が対応していなければ device は none", status(c)["device"] == "none")
+    check("CPU が対応していなくても変換できる", converts(c, 1))
+    r = reload(c)
+    check("反映しても unsupported のまま、errors に /zenzai",
+          status(c)["zenzai"] == "unsupported" and [e["path"] for e in r["errors"]] == ["/zenzai"], r)
+    write_config(env, {"enabled": False, "model_path": str(MODEL)})
+    r = reload(c)
+    check("無効にしたら disabled", r["errors"] == [] and status(c)["zenzai"] == "disabled", r)
+    c.close()
+    check("正常に終わる", server.stop() == 0)
+    log = server.log_path.read_text()
+    check("ログに足りない命令を書く", "AVX2" in log and "Zenzai を使えない" in log, log)
+
 print("OK" if failed == 0 else f"{failed} 件が失敗した")
 sys.exit(1 if failed else 0)

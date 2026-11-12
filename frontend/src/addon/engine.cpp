@@ -336,7 +336,7 @@ void PazkeyEngine::loadConfig() {
     FCITX_WARN() << "pazkey: 設定が不正なので、前の設定を使い続ける: " << text;
     if (text != lastConfigError_) {
         lastConfigError_ = text;
-        notify("pazkey の設定に誤りがある", "前の設定で動き続けている。\n" + configPath() + "\n" + text);
+        notify("pazkey: 設定に誤りがあります", "直前の正しい設定のまま動いています。\n" + configPath() + "\n" + text);
     }
 }
 
@@ -359,7 +359,7 @@ void PazkeyEngine::setConfig(const fcitx::RawConfig &raw) {
     Config next = fromFcitxConfig(screen, config_);
     if (auto error = saveConfig(configPath(), next)) {
         FCITX_WARN() << "pazkey: 設定を保存できない: " << *error;
-        notify("pazkey の設定を保存できない", configPath() + "\n" + *error);
+        notify("pazkey: 設定を保存できませんでした", configPath() + "\n" + *error);
         return;
     }
     FCITX_INFO() << "pazkey: 設定画面から設定を保存した";
@@ -392,10 +392,10 @@ void PazkeyEngine::armDisconnectedNotice() {
         noticeTimer_ = instance_->eventLoop().addTimeEvent(CLOCK_MONOTONIC, at, 1000000, [this](fcitx::EventSourceTime *, uint64_t) {
             if (!client_ || client_->connected() || disconnectedNoticeSent_) return true;
             disconnectedNoticeSent_ = true;
-            notify("pazkey の変換サーバーにつながらない",
-                   "かなのまま入力できるが、変換はされない。\n"
+            notify("pazkey: 変換サーバーに接続できません",
+                   "かな入力はできますが、変換はできません。\n"
                    "状態の確認: systemctl --user status pazkey-server.socket\n"
-                   "再起動の上限に当たったときの戻し方:\n"
+                   "再起動の上限に達したときは、次のコマンドで戻せます:\n"
                    "systemctl --user reset-failed pazkey-server.socket pazkey-server.service\n"
                    "systemctl --user start pazkey-server.socket");
             return true;
@@ -414,7 +414,7 @@ void PazkeyEngine::onMessage(const Incoming &msg) {
     if (msg.type == "hello") {
         if (msg.protocol && *msg.protocol != kProtocolVersion) {
             client_->stop();
-            notify("pazkey のサーバーとプロトコルの版が合わない", "fcitx5-pazkey と pazkey-server を同じ版にそろえる。");
+            notify("pazkey: 変換サーバーと版が合いません", "fcitx5-pazkey と pazkey-server を同じ版にしてください。");
             return;
         }
         onZenzaiState(msg.zenzai);
@@ -423,7 +423,7 @@ void PazkeyEngine::onMessage(const Incoming &msg) {
     if (msg.type == "error" && !msg.session) PAZKEY_DEBUG() << "recv error code=" << msg.code;
     if (msg.type == "error" && msg.code == "protocol_mismatch") {
         client_->stop();
-        notify("pazkey のサーバーとプロトコルの版が合わない", "fcitx5-pazkey と pazkey-server を同じ版にそろえる。");
+        notify("pazkey: 変換サーバーと版が合いません", "fcitx5-pazkey と pazkey-server を同じ版にしてください。");
         return;
     }
     if (msg.type == "config_changed") {
@@ -458,14 +458,17 @@ void PazkeyEngine::onZenzaiState(const std::string &state) {
     auto notice = zenzaiNotice_.update(state);
     if (!notice) return;
     if (*notice == "unavailable") {
-        notify("pazkey: Zenzai のモデルを読み込めない",
-               "Zenzai なしで変換している。\n"
-               "モデルがなければ、設定画面の「Zenzai」の「モデルをダウンロード」で取得できる。\n"
-               "自分で用意したモデルを指しているなら、モデルのパスを確かめる。");
+        notify("pazkey: Zenzai のモデルを読み込めません",
+               "Zenzai を使わずに変換を続けます。\n"
+               "モデルは、設定画面の「Zenzai」の「モデルをダウンロード」で取得できます。\n"
+               "自分で用意したモデルを使う場合は、パスを確認してください。");
+    } else if (*notice == "unsupported") {
+        notify("pazkey: Zenzai は搭載の CPU をサポートしません",
+               "AVX2 に対応した CPU が必要です。Zenzai を使わずに変換を続けます。");
     } else {
-        notify("pazkey: Zenzai を切って動いている（退避モード）",
-               "変換サーバーが続けて異常終了したので、Zenzai を使わずに動いている。\n"
-               "設定画面で保存し直すと、Zenzai を試し直す。");
+        notify("pazkey: Zenzai を一時的に止めています",
+               "変換サーバーの異常終了が続いたため、Zenzai を使わずに動いています。\n"
+               "設定画面で保存し直すと、Zenzai をもう一度試します。");
     }
 }
 

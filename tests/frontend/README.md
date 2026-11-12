@@ -48,7 +48,7 @@ systemctl --user stop pazkey-server.socket pazkey-server.service
 
 1. ひらがなを入力する。
 2. Space を押す。代用の候補（ひらがな、カタカナ、半角カタカナ）がすぐ出て、候補ウィンドウに「サーバー未接続」と出る。
-3. 30秒ほどそのままにすると、「変換サーバーにつながらない」の通知が1回だけ出る。見落としたときは、KDE の通知の履歴（タスクトレイのベル）か、fcitx5 のログの「pazkey: 通知を送る」で確かめる。
+3. 30秒ほどそのままにすると、「変換サーバーに接続できません」の通知が1回だけ出る。見落としたときは、KDE の通知の履歴（タスクトレイのベル）か、fcitx5 のログの「pazkey: 通知を送る」で確かめる。
 
 ```sh
 systemctl --user start pazkey-server.socket

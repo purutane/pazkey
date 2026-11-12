@@ -9,11 +9,11 @@ namespace pazkey {
 
 class ZenzaiNotice {
 public:
-    /// hello か config_changed の zenzai を渡す。知らせるべきなら、その状態（unavailable か fallback）を返す。
+    /// hello か config_changed の zenzai を渡す。知らせるべきなら、その状態（unavailable、fallback、unsupported）を返す。
     /// 同じ状態が続くあいだ（再接続の hello を含む）は返さない。enabled か disabled を受けたら忘れる。
     /// 知らない値と空（古いサーバー）は無視する。
     std::optional<std::string> update(std::string_view state) {
-        if (state == "unavailable" || state == "fallback") {
+        if (state == "unavailable" || state == "fallback" || state == "unsupported") {
             if (state == notified_) return std::nullopt;
             notified_ = state;
             return notified_;

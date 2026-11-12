@@ -1,0 +1,28 @@
+# Maintainer: purutane <kopa1986 at gmail dot com>
+# ビルド済みのものを入れるパッケージ。中身は、リポジトリ直下の PKGBUILD を tools/build-bin.sh でクリーンな chroot で
+# ビルドしたもので、GitHub の Release に置いてある（docs/server.md「ビルド」）。依存とライセンスは、リポジトリ直下の
+# PKGBUILD と同じにする。
+
+pkgname=fcitx5-pazkey-bin
+pkgver=0.2.0
+pkgrel=1
+# Release に置いた tar のビルド番号。ソースを変えずに作り直したとき（fcitx5 の ABI が変わったときなど）に上げる。
+_build=1
+pkgdesc='Japanese input method for fcitx5 using azooKey (prebuilt)'
+arch=('x86_64')
+url='https://github.com/purutane/pazkey'
+# pazkey は MIT。残りは同梱するもの（THIRD_PARTY_NOTICES）のライセンス。
+license=('MIT' 'Apache-2.0' 'Apache-2.0 WITH Swift-exception' 'BSD-2-Clause' 'BSD-3-Clause'
+         'Unicode-3.0' 'ICU' 'NAIST-2003')
+depends=('fcitx5' 'systemd>=254' 'curl' 'glibc' 'libgcc' 'libstdc++' 'libgomp' 'hicolor-icon-theme')
+provides=("fcitx5-pazkey=$pkgver")
+conflicts=('fcitx5-pazkey')
+# 中身はリリースのビルドで、strip も済んでいる。
+options=('!strip' '!debug')
+source_x86_64=("https://github.com/purutane/pazkey/releases/download/v$pkgver/pazkey-$pkgver-$_build-$CARCH.tar.zst")
+sha256sums_x86_64=('0b70e3db94dee5277097fa318b09221abb8d36597dce038d26cce930c628efd6')
+
+package() {
+    cp -a --no-preserve=ownership "$srcdir/usr" "$pkgdir/"
+    mv "$pkgdir/usr/share/licenses/fcitx5-pazkey" "$pkgdir/usr/share/licenses/$pkgname"
+}

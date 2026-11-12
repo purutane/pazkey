@@ -15,18 +15,20 @@ using namespace pazkey;
 TEST(ZenzaiStatusTest, Table) {
     EXPECT_EQ(zenzaiStatusText({true, true, "enabled", true}), "ダウンロード中");
     EXPECT_EQ(zenzaiStatusText({true, false, "", false}), "ダウンロード中");
-    EXPECT_EQ(zenzaiStatusText({false, false, "enabled", true}), "サーバーにつながっていない");
+    EXPECT_EQ(zenzaiStatusText({false, false, "enabled", true}), "変換サーバーに接続していません");
     EXPECT_EQ(zenzaiStatusText({false, true, "enabled", true}), "使用中");
     EXPECT_EQ(zenzaiStatusText({false, true, "enabled", false}), "使用中");  // 既定の場所: 読み込んだあとで消された
     EXPECT_EQ(zenzaiStatusText({false, true, "enabled", true, true}), "使用中");
     EXPECT_EQ(zenzaiStatusText({false, true, "enabled", false, true}),
-              "使用中（指定したモデルがないので、前のモデルで動いている）");
+              "使用中（指定したモデルがないため、前のモデルを使用）");
     EXPECT_EQ(zenzaiStatusText({false, true, "disabled", false}), "無効");
-    EXPECT_EQ(zenzaiStatusText({false, true, "fallback", true}), "退避モード");
-    EXPECT_EQ(zenzaiStatusText({false, true, "unavailable", false}), "モデルがない（ダウンロードできる）");
-    EXPECT_EQ(zenzaiStatusText({false, true, "unavailable", true}), "モデルを読み込めない");
-    EXPECT_EQ(zenzaiStatusText({false, true, "unavailable", false, true}), "指定したモデルがない");
-    EXPECT_EQ(zenzaiStatusText({false, true, "unavailable", true, true}), "モデルを読み込めない");
+    EXPECT_EQ(zenzaiStatusText({false, true, "fallback", true}), "一時停止中");
+    EXPECT_EQ(zenzaiStatusText({false, true, "unsupported", true}), "搭載の CPU をサポートしません");
+    EXPECT_EQ(zenzaiStatusText({false, true, "unsupported", false}), "搭載の CPU をサポートしません");
+    EXPECT_EQ(zenzaiStatusText({false, true, "unavailable", false}), "モデルがありません（ダウンロードできます）");
+    EXPECT_EQ(zenzaiStatusText({false, true, "unavailable", true}), "モデルを読み込めません");
+    EXPECT_EQ(zenzaiStatusText({false, true, "unavailable", false, true}), "指定したモデルが見つかりません");
+    EXPECT_EQ(zenzaiStatusText({false, true, "unavailable", true, true}), "モデルを読み込めません");
 }
 
 class ZenzaiStatusPathTest : public ::testing::Test {

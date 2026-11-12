@@ -10,3 +10,7 @@ RestartSec=200ms
 RestartSteps=5
 RestartMaxDelaySec=10s
 TimeoutStopSec=3s
+# 変換サーバーは外部と通信しない（docs/server.md「外部との通信を塞ぐ」）。
+# 名前空間を作れない環境では PrivateNetwork が効かないので、seccomp の制限を重ねる。
+PrivateNetwork=yes
+RestrictAddressFamilies=AF_UNIX

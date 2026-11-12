@@ -38,6 +38,8 @@ enum ZenzaiState: String, Sendable {
     /// 退避モード（docs/server.md「退避モード」）。設定では有効だが、Zenzai を切って動いている。
     case fallback
     case unavailable
+    /// 設定では有効だが、llama.cpp が使う命令に CPU が対応していないので、モデルを読み込まない。
+    case unsupported
 }
 
 /// azooKey へのアクセスをすべて受け持つ。
@@ -57,6 +59,8 @@ final class Engine: @unchecked Sendable {
     private(set) var zenzaiState: ZenzaiState = .disabled
     /// 退避モードか。起動時に決め、設定の反映（reload）で解除を試みる。
     private var fallback: Bool
+    /// llama.cpp が使うのに、この CPU にない命令。空でなければ Zenzai を使わない。
+    private static let missingCpuFeatures = CpuSupport.missingFeatures()
 
     private struct SessionState {
         let id: KanaKanjiConverter.ConversionSessionID
@@ -137,6 +141,13 @@ final class Engine: @unchecked Sendable {
             zenzaiModel = nil
             zenzaiState = .disabled
             return nil
+        }
+        // 読み込むと落ちるので、退避モードより先に確かめる。起動中に CPU は変わらないので、1回だけ調べる。
+        if !Self.missingCpuFeatures.isEmpty {
+            zenzaiModel = nil
+            zenzaiState = .unsupported
+            let names = Self.missingCpuFeatures.joined(separator: "、")
+            return "この CPU は llama.cpp が使う命令（\(names)）に対応していないので、Zenzai を使えない"
         }
         if fallback {
             zenzaiModel = nil

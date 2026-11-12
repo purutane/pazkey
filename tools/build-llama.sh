@@ -30,12 +30,12 @@ if [ "$(git -C "$src" rev-parse -q --verify HEAD 2>/dev/null || true)" != "$LLAM
     git -C "$src" checkout -q --detach FETCH_HEAD
 fi
 
-# CPU 版のライブラリだけを作る。GGML_NATIVE は既定（ON）のままで、この機械の CPU 向けに最適化する。
+# CPU 版のライブラリだけを作る。この機械の CPU 向けに最適化する（GGML_NATIVE。PKGBUILD と同じく明示する）。
 # RUNPATH を $ORIGIN にして、libllama.so の依存（libggml*.so）が同じ場所から見つかるようにする。
 rm -rf "$src/build" "$dest"
 cmake -S "$src" -B "$src/build" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON \
     -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_SERVER=OFF -DLLAMA_CURL=OFF \
-    '-DCMAKE_INSTALL_RPATH=$ORIGIN' -DCMAKE_INSTALL_PREFIX="$dest" -DCMAKE_INSTALL_LIBDIR=lib
+    -DGGML_NATIVE=ON '-DCMAKE_INSTALL_RPATH=$ORIGIN' -DCMAKE_INSTALL_PREFIX="$dest" -DCMAKE_INSTALL_LIBDIR=lib
 cmake --build "$src/build" -j"$(nproc)"
 cmake --install "$src/build"
 echo "$LLAMA_COMMIT" > "$stamp"

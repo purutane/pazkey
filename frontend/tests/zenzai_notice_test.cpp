@@ -52,3 +52,11 @@ TEST(ZenzaiNoticeTest, ParsedFromMessages) {
     ASSERT_TRUE(old);
     EXPECT_EQ(old->zenzai, "");
 }
+
+TEST(ZenzaiNoticeTest, UnsupportedNotifiesOnce) {
+    ZenzaiNotice n;
+    EXPECT_EQ(n.update("unsupported"), "unsupported");
+    EXPECT_EQ(n.update("unsupported"), std::nullopt);
+    EXPECT_EQ(n.update("disabled"), std::nullopt);
+    EXPECT_EQ(n.update("unsupported"), "unsupported");
+}

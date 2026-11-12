@@ -62,7 +62,7 @@ fcitx5 アドオン（以下クライアント）および `pazkey-ctl` と、�
 {"type":"hello","protocol":1,"server":"pazkey-server","version":"0.1.0","zenzai":"enabled","config_generation":3}
 ```
 
-- `zenzai` は `enabled`、`disabled`（設定で無効）、`fallback`（退避モード）、`unavailable`（設定では有効だが、モデルを読み込めなかった。`docs/server.md`「Zenzai のモデルの読み込み」）のいずれか。
+- `zenzai` は `enabled`、`disabled`（設定で無効）、`fallback`（退避モード）、`unavailable`（設定では有効だが、モデルを読み込めなかった。`docs/server.md`「Zenzai のモデルの読み込み」）、`unsupported`（設定では有効だが、llama.cpp が使う命令に CPU が対応していないので、モデルを読み込まない。同じ節）のいずれか。フロントエンドは知らない値を無視する。
 - `config_generation` は、サーバーが設定を読み込むたびに1ずつ増える数。
 - `protocol` が一致しない場合、サーバーは `error`（`code`: `protocol_mismatch`）を返して接続を閉じる。
 

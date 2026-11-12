@@ -38,8 +38,12 @@ Zenzai ありのテストは、`tools/fetch-test-model.sh` で `vendor/zenz-v3.2
 
 - 取得は `source=()` と `prepare()` で済ませ、`build()` ではネットワークに出ない。SwiftPM の依存は、`prepare()` で `Package.resolved` のとおりに取得する（`--force-resolved-versions`）。SwiftPM の取得物と設定は、利用者のホームではなくビルドのディレクトリに置く。
 - llama.cpp は、版と設定を `tools/build-llama.sh` と同じにしてビルドする。
+- ビルド済みのものを入れるパッケージ（`-bin`）では、llama.cpp を、ビルドした機械の CPU 向けではなく、命令の下限を決めてビルドする（`GGML_NATIVE=OFF`）。下限は SSE4.2、AVX、AVX2、FMA、F16C、BMI2 で、Intel は Haswell（2013年）以降、AMD は Excavator（2015年）以降にあたる。ソースからビルドするパッケージと `tools/build-llama.sh` は、ビルドする機械の CPU 向けに最適化する（`GGML_NATIVE=ON`）。下限を決めても、Zenzai の変換時間はネイティブ版より数%遅いだけである。
+- `-bin` が入れるものは、`tools/build-bin.sh` で作る。リポジトリ直下の PKGBUILD の llama.cpp の設定だけを下限を決めたものに替え、クリーンな chroot でビルドする。できたパッケージの中身を1つの tar にし、GitHub の Release に、ソースと同じタグで置く。`-bin` の PKGBUILD（`packaging/fcitx5-pazkey-bin/`）は、その tar を展開して写すだけにし、依存はリポジトリ直下の PKGBUILD と同じにする。
+- `GGML_NATIVE` は、どちらのパッケージでも明示する。makepkg は `SOURCE_DATE_EPOCH` を設定し、llama.cpp はそれを見ると `GGML_NATIVE` の既定を OFF にし、AVX などの命令も既定で使わなくなる（SSE4.2 まで）。そうなると、Zenzai の変換時間はおよそ4倍になる。
 - サーバーのビルドでは、`PAZKEY_LLAMA_DIR` をビルドした llama.cpp の場所に、`PAZKEY_LLAMA_RPATH`（rpath に埋め込む場所。既定は `PAZKEY_LLAMA_DIR` と同じ）を `/usr/lib/pazkey/llama` にする。
 - Swift のランタイムを同梱するので、`pazkey-server` と `pazkey-ctl` の RUNPATH には、ツールチェーンの場所も `$ORIGIN` も入れず、同梱する場所（`/usr/lib/pazkey/swift`）だけを入れる。ツールチェーンの場所が残っていると、Swift を入れている機械ではそちらのランタイムが先に読まれる。
+- SwiftPM は makepkg の `CXXFLAGS` と `LDFLAGS` を読まないので、要るものは `swift build` に明示する。C++ の `__FILE__` からビルドの場所を除き（`-fmacro-prefix-map`）、実行ファイルを FULL RELRO にする（`-z now`）。
 - `check()` はフロントエンドの単体テストを流す。サーバーのテスト（`tests/server/`）は systemd や入れた後の場所に頼るので、パッケージのビルドでは流さない。
 
 普段動かすのは必ずリリースビルドにする。azooKey はデバッグビルド（`DEBUG`）で、変換した読みを標準出力に書く（`SwiftUtils/Debug.swift`）。「ログ」の節の取り決めに反するからである。
@@ -175,6 +179,9 @@ azooKey には、モデルを読み込むだけの公開の API がない。Zenz
 - 起動時と、重い項目を反映するときに、使い捨てのセッションで1回変換してモデルを読み込ませ、`zenzStatus` で成否を確かめる。最初のキー入力で読み込みを待たせないためでもある。
 - 起動時に失敗したら、Zenzai なしで動く。`hello` と `status` の `zenzai` は `unavailable` を返し、ログに残す。
 - 重い項目の反映で失敗したら、Zenzai の部分（有無、モデル、デバイス）だけ前の状態のまま動き続け、ほかの項目は反映する。前の状態が Zenzai なしなら `unavailable` にする。エラーはログと `reload_result`（`pazkey-ctl reload` を使った場合）で報告する。
+- モデルを読み込む前に、llama.cpp の CPU 版がビルドのときに使うと決めた命令（`-bin` では AVX2 など。「ビルド」）に、CPU が対応しているかを確かめる。対応していない CPU で読み込むと、不正な命令（SIGILL）でサーバーが落ちる。落ちると退避モードには入るが、それまで（既定では3回）入力が止まり、利用者には理由が分からない。足りなければモデルを読み込まずに Zenzai なしで動き、`zenzai` は `unsupported` を返し、足りない命令の名前をログに残す。反映のたびに同じ理由をエラーとして返す（`reload_result`）。退避モードより先に確かめる。
+  - ビルドで使うと決めた命令は llama.cpp が公開する、ビルドの設定を返す関数（定数を返すだけで、その命令を実行しない。CPU の対応を調べる関数は、内部でその命令を実行しうるので使わない）で、CPU が対応する命令は `/proc/cpuinfo` の flags で調べる。flags を読めなければ、確かめずに読み込む（ログに残す）。
+  - テストのときだけ、環境変数 `PAZKEY_TEST_CPU_FLAGS`（空白区切り）で CPU の flags を差し替えられる。
 - 設定画面だけを使う利用者には、フロントエンドが fcitx5 の通知で知らせる（`docs/frontend.md`「Zenzai の状態を知らせる」）。サーバーは `hello` と `config_changed` の `zenzai` で状態を伝える。
 
 ## Zenzai のモデルの取得
@@ -231,6 +238,8 @@ RestartSec=200ms
 RestartSteps=5
 RestartMaxDelaySec=10s
 TimeoutStopSec=3s
+PrivateNetwork=yes
+RestrictAddressFamilies=AF_UNIX
 ```
 
 `pazkey-fetch-model.service`（「Zenzai のモデルの取得」。有効にはせず、設定画面のボタンが起動する）:
@@ -249,6 +258,15 @@ ExecStart=/usr/bin/pazkey-ctl fetch-model --notify
 ソケットのユニットは、既定で有効にする。パッケージが `/usr/lib/systemd/user/sockets.target.wants/pazkey-server.socket`（`../pazkey-server.socket` へのリンク）を持つ。プリセットや `systemctl --global enable` を使わないのは、Arch ではユーザーのユニットのプリセットが入れても適用されず、`--global enable` が作る `/etc` のリンクは pacman が管理しない（外したときに残る）からである。ソケットのユニットには `[Install]` を書かない。書くと、`/etc` と `~/.config` にリンクがないので、`systemctl --user is-enabled` や `status` が、ログインで起動するのに `disabled` と出て紛らわしい。書かなければ、同じ形で入る `dbus.socket` などと同じく `static` と出る。`enable` と `disable` は使えないので、利用者が止めるときは `systemctl --user mask pazkey-server.socket` を使う。入れた直後のセッションではソケットは待ち受けていないので、ログインし直す（または `systemctl --user start pazkey-server.socket`）。`RestartSteps` を使うので、systemd 254 以上が要る。
 
 `StartLimitIntervalSec`、`RestartSec`、`RestartSteps`、`RestartMaxDelaySec` は「再起動回数の上限」で決めた。`TimeoutStopSec` の 3s は、終わるときにかかる時間（処理中の変換を待つ分と学習の保存で、最悪で約1秒）の3倍ほどにした。
+
+### 外部との通信を塞ぐ
+
+変換サーバーは外部と通信しない。外部と通信するのはモデルの取得（「Zenzai のモデルの取得」）だけで、別のユニット `pazkey-fetch-model.service` で動く。サーバーのユニットはこれを2つの設定で保証する。
+
+- `PrivateNetwork=yes`: ネットワークの名前空間を分け、サーバーから見えるネットワークを `lo` だけにする。ユーザーのユニットでは `PrivateUsers` も暗黙に有効になり、サーバーはユーザーの名前空間の中で動く（自分の uid だけが対応づけられる）。ファイルシステム上の AF_UNIX のソケット（待ち受けのソケット、journald）はそのまま使える。
+- `RestrictAddressFamilies=AF_UNIX`: seccomp で、AF_UNIX 以外のソケット（IP、netlink など）を作れなくする。名前空間を作れない環境（カーネルが unprivileged user namespaces を許していない場合など）では、systemd は `PrivateNetwork` を適用せずにサーバーを起動するので、こちらを重ねて塞ぐ。
+
+どちらの設定も、適用できない環境では systemd が適用せずにサーバーを起動する。設定が効かないことで変換が止まることはない。
 
 ### 再起動回数の上限
 

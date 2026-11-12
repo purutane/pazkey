@@ -11,18 +11,19 @@ namespace pazkey {
 
 std::string zenzaiStatusText(const ZenzaiStatusInput &in) {
     if (in.fetching) return "ダウンロード中";
-    if (!in.connected) return "サーバーにつながっていない";
+    if (!in.connected) return "変換サーバーに接続していません";
     if (in.state == "enabled") {
         // 反映で読み込めず、前のモデルのまま動いている（docs/server.md「Zenzai のモデルの読み込み」）
-        if (in.customModel && !in.modelExists) return "使用中（指定したモデルがないので、前のモデルで動いている）";
+        if (in.customModel && !in.modelExists) return "使用中（指定したモデルがないため、前のモデルを使用）";
         return "使用中";
     }
     if (in.state == "disabled") return "無効";
-    if (in.state == "fallback") return "退避モード";
+    if (in.state == "fallback") return "一時停止中";
+    if (in.state == "unsupported") return "搭載の CPU をサポートしません";
     if (in.state == "unavailable") {
-        if (in.modelExists) return "モデルを読み込めない";
+        if (in.modelExists) return "モデルを読み込めません";
         // 自分で指したモデルがないときは、ダウンロードしても直らない
-        return in.customModel ? "指定したモデルがない" : "モデルがない（ダウンロードできる）";
+        return in.customModel ? "指定したモデルが見つかりません" : "モデルがありません（ダウンロードできます）";
     }
     return "不明";
 }

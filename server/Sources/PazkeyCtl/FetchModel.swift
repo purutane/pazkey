@@ -66,7 +66,7 @@ private func reloadServer() -> String?? {
 
 func fetchModel(notify: Bool) -> Never {
     if notify {
-        beforeFail = { desktopNotify("pazkey: Zenzai のモデルを取得できない", $0) }
+        beforeFail = { desktopNotify("pazkey: Zenzai のモデルをダウンロードできませんでした", $0) }
     }
     let dir = Paths.dataDirectory
     let target = Paths.defaultModel.path
@@ -86,7 +86,7 @@ func fetchModel(notify: Bool) -> Never {
         say("すでにある: \(target)")
     } else {
         say("取得する: \(ModelSource.url)")
-        if notify { desktopNotify("pazkey: Zenzai のモデルを取得している", "約 74MB。終わったら知らせる。") }
+        if notify { desktopNotify("pazkey: Zenzai のモデルをダウンロードしています", "約 74MB です。終わったらお知らせします。") }
         unlink(part)
         guard let r = run(["curl", "-fL", "--retry", "3", "--silent", "--show-error", "-o", part, ModelSource.url]) else {
             fail("curl を実行できない")
@@ -119,6 +119,6 @@ func fetchModel(notify: Bool) -> Never {
     case let .some(error?):
         fail("置いたが、サーバーが読み込めなかった:\n\(error)")
     }
-    if notify { desktopNotify("pazkey: Zenzai のモデルを取得した", "\(target) に置いた。") }
+    if notify { desktopNotify("pazkey: Zenzai のモデルをダウンロードしました", "\(target) に保存しました。") }
     exit(0)
 }

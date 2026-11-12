@@ -1,6 +1,6 @@
 # pazkey
 
-fcitx5 で使う日本語入力（かな漢字変換）です。変換エンジンには [azooKey](https://github.com/azooKey/AzooKeyKanaKanjiConverter) を使い、ニューラル変換の Zenzai にも対応しています。Arch Linux 向けに、PKGBUILD で入れる形で配っています。
+fcitx5 で使う日本語入力（かな漢字変換）です。変換エンジンには [azooKey](https://github.com/azooKey/AzooKeyKanaKanjiConverter) を使い、ニューラル変換の Zenzai にも対応しています。Arch Linux 向けに、AUR で配っています。
 
 pazkey は次の方針で作っています。
 
@@ -10,38 +10,39 @@ pazkey は次の方針で作っています。
 
 ## 状態
 
-v0.1 は、知り合いに試してもらうための版です。確かめているのは Arch Linux（x86_64）だけです。気づいたことは「[報告の仕方](#報告の仕方)」のとおりに知らせてもらえると助かります。
+まだ試してもらう段階の版です。確かめているのは Arch Linux（x86_64）だけです。気づいたことは「[報告の仕方](#報告の仕方)」のとおりに知らせてもらえると助かります。
 
 ## 必要なもの
 
 - Arch Linux（x86_64）と、fcitx5 を入力メソッドとして使える状態になっていること。設定画面を使うには fcitx5-configtool も要ります。
 - systemd 254 以上のユーザーセッション。
-- ビルドに使う Swift のツールチェーン。Arch の公式リポジトリにはないので、AUR の [`swift-bin`](https://aur.archlinux.org/packages/swift-bin) を先に入れてください（約 3.5GB）。ビルドにだけ使い、pazkey は使う Swift のランタイムを同梱しているので、入れたあとは外してかまいません。
+- Zenzai を使うには、AVX2 に対応した CPU（Intel は 2013年の Haswell 以降、AMD は 2015年の Excavator 以降）。対応していなくても、Zenzai なしの変換は使えます。
 
 ## インストール
 
-1. AUR の `swift-bin` を入れます。AUR ヘルパーを使っているなら `paru -S swift-bin` などで、使っていなければ次のとおりです。
+AUR に2つの版があります。ふつうはビルド済みの `fcitx5-pazkey-bin` を入れてください。
+
+| パッケージ | 中身 |
+|---|---|
+| [`fcitx5-pazkey-bin`](https://aur.archlinux.org/packages/fcitx5-pazkey-bin) | ビルド済みのもの。すぐに入ります |
+| [`fcitx5-pazkey`](https://aur.archlinux.org/packages/fcitx5-pazkey) | 自分の機械でソースからビルドします。ビルドに Swift のツールチェーン（AUR の [`swift-bin`](https://aur.archlinux.org/packages/swift-bin)、約 3.5GB）が要ります |
+
+1. `fcitx5-pazkey-bin` を入れます。AUR ヘルパーを使っているなら `paru -S fcitx5-pazkey-bin` などで、使っていなければ次のとおりです。
 
     ```sh
-    git clone https://aur.archlinux.org/swift-bin.git
-    cd swift-bin
+    git clone https://aur.archlinux.org/fcitx5-pazkey-bin.git
+    cd fcitx5-pazkey-bin
     makepkg -si
     ```
 
-2. pazkey を取得して、ビルドして入れます。ほかに要るもの（cmake、gtest など）は `makepkg -s` が公式リポジトリから入れます。
-
-    ```sh
-    git clone https://github.com/purutane/pazkey.git
-    cd pazkey
-    makepkg -si
-    ```
-
-3. ログインし直します。fcitx5 にアドオンを読み込ませ、変換サーバーを待ち受けさせるためです。
-4. fcitx5-configtool の「入力メソッド」で「pazkey」を足します。
+2. ログインし直します。fcitx5 にアドオンを読み込ませ、変換サーバーを待ち受けさせるためです。
+3. fcitx5-configtool の「入力メソッド」で「pazkey」を足します。
 
 入力メソッドを pazkey に切り替えて、`kanji` と打って Space を押し、候補が出れば入っています。
 
-`swift-bin` を外すときは `sudo pacman -Rns swift-bin` を実行してください。版を上げるときは、新しい版を取得して（`git pull`）、もう一度 `makepkg -si` を実行し、ログインし直してください。
+ソースからビルドする `fcitx5-pazkey` を入れるときは、先に `swift-bin` を入れてから、同じ手順で `fcitx5-pazkey` を入れてください。`swift-bin` はビルドにだけ使います。pazkey は使う Swift のランタイムを同梱しているので、入れたあとは `sudo pacman -Rns swift-bin` で外してかまいません（版を上げるときにまた要ります）。2つの版は同時には入れられません。
+
+版を上げたあとは、ログインし直してください。
 
 ## Zenzai のモデル
 
@@ -55,6 +56,8 @@ Zenzai のモデルは pazkey に含まれていません。使うときは、�
 使われているかは、設定画面の Zenzai のグループの「状態」の行（画面を開き直すと更新されます）か、端末で `pazkey-ctl status` を実行して見られます。`status` の `zenzai` が `enabled` なら使えています。
 
 モデルがなくても、辞書だけで変換できます。自分で用意したモデルを使うときは、設定の「自分で用意したモデル」にそのファイルのパスを書いてください。
+
+pazkey が外部と通信するのは、このモデルの取得だけです。変換サーバーは、systemd の設定でネットワークを使えないようにしてあります（[docs/server.md](docs/server.md) の「外部との通信を塞ぐ」）。
 
 ## 使い方
 
@@ -83,15 +86,17 @@ Zenzai のモデルは pazkey に含まれていません。使うときは、�
     systemctl --user start pazkey-server.socket
     ```
 
-- **Zenzai を使わずに動いていると通知が出た**: モデルがないか、読み込めなかったときです。通知の文面のとおり、設定画面からモデルを取得するか、自分で指したモデルのパスを確かめてください。サーバーが続けて落ちたために Zenzai を切った（退避モード）ときは、設定画面で保存し直すと Zenzai を試し直します。
+- **Zenzai を使わずに動いていると通知が出た**: モデルがないか、読み込めなかったときです。通知の文面のとおり、設定画面からモデルを取得するか、自分で指したモデルのパスを確かめてください。サーバーが続けて落ちたために Zenzai を一時的に止めたときは、設定画面で保存し直すと Zenzai をもう一度試します。「搭載の CPU をサポートしません」という通知のときは、CPU が AVX2 に対応していないので、その機械では Zenzai を使えません。
 
 変換サーバーはログインすると起動します。止めたいときは `systemctl --user mask --now pazkey-server.socket` を実行してください（`disable` は使えません）。戻すときは `unmask` してからログインし直します。
 
 ## アンインストール
 
 ```sh
-sudo pacman -Rns fcitx5-pazkey
+sudo pacman -Rns fcitx5-pazkey-bin
 ```
+
+ソースからビルドした版なら `fcitx5-pazkey` です。
 
 外してからログインし直してください。fcitx5-configtool の入力メソッドからも pazkey を外してください。次の利用者のデータは残るので、要らなければ消してください。
 

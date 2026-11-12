@@ -71,22 +71,22 @@ FCITX_CONFIGURATION(InputGroup,
 
 FCITX_CONFIGURATION(ContextGroup,
     fcitx::Option<bool> enabled{
-        this, "enabled", "左文脈を送る", fcitx_config_detail::kDefaults.context.enabled};
+        this, "enabled", "直前の文章を変換に使う", fcitx_config_detail::kDefaults.context.enabled};
     fcitx::Option<int, fcitx::IntConstrain> maxChars{
-        this, "max_chars", "送る左文脈の最大文字数", fcitx_config_detail::kDefaults.context.maxChars, {0, 256}};);
+        this, "max_chars", "変換に使う直前の文章の最大文字数", fcitx_config_detail::kDefaults.context.maxChars, {0, 256}};);
 
 FCITX_CONFIGURATION(ZenzaiGroup,
     // 状態の行は表示だけで、config.json には書かない（fromFcitxConfig が読まない）。
-    fcitx_config_detail::StatusOption status{this, "status", "状態（設定を変えたら、画面を開き直すと更新される）"};
+    fcitx_config_detail::StatusOption status{this, "status", "状態（画面を開き直すと更新されます）"};
     fcitx::Option<bool> enabled{this, "enabled", "Zenzai を使う", fcitx_config_detail::kDefaults.zenzai.enabled};
     fcitx_config_detail::ExternalOptionWithToolTip downloadModel{
         this, "download_model", "モデルをダウンロード（約 74MB）", fcitx_config_detail::kFetchModelCommand,
-        "Hugging Face の Miwa-Keita/zenz-v3.2-small-gguf（Apache-2.0）の決まった版を取得し、"
-        "ハッシュを確かめてから ~/.local/share/pazkey/zenz.gguf に置く。結果は通知で知らせる"};
+        "Hugging Face の Miwa-Keita/zenz-v3.2-small-gguf（Apache-2.0）の決まった版をダウンロードし、"
+        "ハッシュを確認してから ~/.local/share/pazkey/zenz.gguf に保存します。結果は通知でお知らせします。"};
     fcitx_config_detail::ModelPathOption modelPath{
         this, "model_path", "自分で用意したモデル（空ならダウンロードしたものを使う）",
         fcitx_config_detail::kDefaults.zenzai.modelPath, {}, {},
-        fcitx::ToolTipAnnotation("gguf ファイルのパスを書く。ふだんは空のままでよい")};
+        fcitx::ToolTipAnnotation("gguf ファイルのパスを入力します。通常は空のままで構いません。")};
     fcitx::Option<int, fcitx::IntConstrain> inferenceLimit{
         this, "inference_limit", "1回の変換での推論回数の上限", fcitx_config_detail::kDefaults.zenzai.inferenceLimit,
         {1, 1000}};);
@@ -98,10 +98,10 @@ FCITX_CONFIGURATION(AdvancedGroup,
     fcitx::Option<int, fcitx::IntConstrain> maxPages{
         this, "max_pages", "取得する候補の最大ページ数", fcitx_config_detail::kDefaults.candidates.maxPages, {1, 20}};
     fcitx::Option<int, fcitx::IntConstrain> fullMs{
-        this, "full_ms", "変換キーを押してから代用の候補を出すまでの時間（ミリ秒）",
+        this, "full_ms", "変換を待つ時間の上限（ミリ秒）",
         fcitx_config_detail::kDefaults.timeout.fullMs, {50, 5000}};
     fcitx::Option<int, fcitx::IntConstrain> saveEveryCommits{
-        this, "save_every_commits", "学習を保存する確定の回数", fcitx_config_detail::kDefaults.learning.saveEveryCommits,
+        this, "save_every_commits", "学習を保存する間隔（確定の回数）", fcitx_config_detail::kDefaults.learning.saveEveryCommits,
         {1, 1000}};
     fcitx::Option<int, fcitx::IntConstrain> saveIdleSeconds{
         this, "save_idle_seconds", "最後の確定から学習を保存するまでの秒数",
