@@ -22,6 +22,15 @@ pazkey は次の方針で作っています。
 
 AUR に2つの版があります。ふつうはビルド済みの `fcitx5-pazkey-bin` を入れてください。
 
+> [!NOTE]
+> AUR には準備中です（AUR の新しいアカウントの登録が止まっているため）。それまでは、次の手順で `fcitx5-pazkey-bin` を入れてください。下の手順1 の代わりになります。
+>
+> ```sh
+> git clone https://github.com/purutane/pazkey.git
+> cd pazkey/packaging/fcitx5-pazkey-bin
+> makepkg -si
+> ```
+
 | パッケージ | 中身 |
 |---|---|
 | [`fcitx5-pazkey-bin`](https://aur.archlinux.org/packages/fcitx5-pazkey-bin) | ビルド済みのもの。すぐに入ります |

@@ -20,7 +20,7 @@ conflicts=('fcitx5-pazkey')
 # 中身はリリースのビルドで、strip も済んでいる。
 options=('!strip' '!debug')
 source_x86_64=("https://github.com/purutane/pazkey/releases/download/v$pkgver/pazkey-$pkgver-$_build-$CARCH.tar.zst")
-sha256sums_x86_64=('0b70e3db94dee5277097fa318b09221abb8d36597dce038d26cce930c628efd6')
+sha256sums_x86_64=('2a3a3ed45c0a856a14f2704191054af4396703d74ff241a2448964d616bc2aed')
 
 package() {
     cp -a --no-preserve=ownership "$srcdir/usr" "$pkgdir/"
